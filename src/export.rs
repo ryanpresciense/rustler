@@ -36,6 +36,14 @@ macro_rules! rustler_export_nifs {
                 }
             }
 
+
+            extern "C" fn nif_upgrade(env: *mut erlang_nif_sys::erlang_nif_sys_api::ErlNifEnv,
+                                      old: *mut *mut std::os::raw::c_void,
+                                      new: *mut *mut std::os::raw::c_void, x: usize) -> i32{
+
+                0
+            }
+
             const FUN_ENTRIES: &'static [$crate::codegen_runtime::DEF_NIF_FUNC] = &[
                 $(rustler_export_nifs!(internal_item_init, $exported_nif)),*
             ];
@@ -48,7 +56,7 @@ macro_rules! rustler_export_nifs {
                 funcs: FUN_ENTRIES.as_ptr(),
                 load: Some(nif_load),
                 reload: None,
-                upgrade: None,
+                upgrade: Some(nif_upgrade),
                 unload: None,
                 vm_variant: b"beam.vanilla\x00".as_ptr(),
                 options: 0,
@@ -82,21 +90,21 @@ macro_rules! rustler_export_nifs {
             flags: ($nif_flag as $crate::schedule::NifScheduleFlags) as u32,
         }
     };
-    
+
     (internal_platform_init, ($inner:expr)) => {
         #[cfg(unix)]
         #[no_mangle]
         pub extern "C" fn nif_init() -> *const $crate::codegen_runtime::DEF_NIF_ENTRY {
             $inner
         }
-        
+
         #[cfg(windows)]
         #[no_mangle]
         pub extern "C" fn nif_init(callbacks: *mut $crate::codegen_runtime::TWinDynNifCallbacks) -> *const $crate::codegen_runtime::DEF_NIF_ENTRY {
             unsafe {
                 $crate::codegen_runtime::WIN_DYN_NIF_CALLBACKS = Some(*callbacks);
             }
-            
+
             $inner
         }
     };
