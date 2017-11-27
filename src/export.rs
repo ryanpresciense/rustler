@@ -1,3 +1,6 @@
+
+
+
 /// Exports a given list of functions to a Erlang module.
 ///
 /// This should be called exactly once in every NIF library. It will wrap and export the given rust
@@ -37,13 +40,12 @@ macro_rules! rustler_export_nifs {
             }
 
 
-            extern "C" fn nif_upgrade(env: *mut erlang_nif_sys::erlang_nif_sys_api::ErlNifEnv,
-                                      old: *mut *mut std::os::raw::c_void,
-                                      new: *mut *mut std::os::raw::c_void, x: usize) -> i32{
+            extern "C" fn nif_upgrade(env: *mut ::erlang_nif_sys::erlang_nif_sys_api::ErlNifEnv,
+                                      old: *mut *mut ::std::os::raw::c_void,
+                                      new: *mut *mut ::std::os::raw::c_void, x: usize) -> i32{
 
                 0
             }
-
             const FUN_ENTRIES: &'static [$crate::codegen_runtime::DEF_NIF_FUNC] = &[
                 $(rustler_export_nifs!(internal_item_init, $exported_nif)),*
             ];
